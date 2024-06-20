@@ -127,7 +127,8 @@ class MainActivity : AppCompatActivity() {
                     // Start the PreviewActivity and pass the image path
                     val intent = Intent(this@MainActivity, PreviewActivity::class.java)
 //                    intent.putExtra(PreviewActivity.EXTRA_IMAGE_PATH, photoFile.absolutePath)
-                    intent.putExtra(PreviewActivity.EXTRA_IMAGE_PATH, "/storage/emulated/0/DCIM/Screenshots/Screenshot_2024-06-04-09-45-50-752_com.google.android.apps.maps.jpg")
+//                    intent.putExtra(PreviewActivity.EXTRA_IMAGE_PATH, "/storage/emulated/0/DCIM/Screenshots/Screenshot_2024-06-04-09-45-50-752_com.google.android.apps.maps.jpg")
+                    intent.putExtra(PreviewActivity.EXTRA_IMAGE_PATH, "/storage/emulated/0/Pictures/1717649314310.jpg")
                     startActivity(intent)
 
 

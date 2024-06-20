@@ -195,7 +195,14 @@ class PreviewActivity : AppCompatActivity() {
         options.inPreferredConfig = Bitmap.Config.ARGB_8888
         val bitmap = BitmapFactory.decodeFile(imagePath, options)
         // Rotate the bitmap if required and return it
-        return rotateBitmap(imagePath, bitmap)
+
+        val bitmapScale = Bitmap.createScaledBitmap(
+            bitmap,
+            (bitmap.width*0.887f).toInt(),
+            (bitmap.height*0.887f).toInt(),
+            true
+        )
+        return rotateBitmap(imagePath, bitmapScale)
     }
 
     // Create a function to display the bitmap
