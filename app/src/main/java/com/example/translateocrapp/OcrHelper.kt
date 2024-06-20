@@ -1,7 +1,9 @@
 package com.example.translateocrapp
 
 import android.graphics.Bitmap
+import android.graphics.Point
 import android.graphics.Rect
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.common.InputImage
@@ -23,19 +25,18 @@ class OcrHelper {
     }
 
 
-    fun performOcr(bitmap: Bitmap): Map<Rect, Text.TextBlock> {
+    fun performOcr(bitmap: Bitmap): Map<Array<Point>, Text.TextBlock> {
         val image = InputImage.fromBitmap(bitmap, 0)
         val task: Task<Text> = textRecognizer.process(image)
         val result = Tasks.await(task)
         return extractTextBlocks(result)
     }
 
-    private fun extractTextBlocks(text: Text): Map<Rect, Text.TextBlock> {
-        val blockMap = mutableMapOf<Rect, Text.TextBlock>()
+    private fun extractTextBlocks(text: Text): Map<Array<Point>, Text.TextBlock> {
+        val blockMap = mutableMapOf<Array<Point>, Text.TextBlock>()
 
         for (textBlock in text.textBlocks) {
-
-            val rect = textBlock.boundingBox
+            val rect = textBlock.cornerPoints
 
             if (rect != null) {
                 blockMap[rect] = textBlock

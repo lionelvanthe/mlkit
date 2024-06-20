@@ -7,11 +7,13 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 
 import android.content.Context
+import android.graphics.Point
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.TranslatorOptions
@@ -154,17 +156,17 @@ class TextTranslator(private val context: Context) {
     }
 
     // Create a function to translate ocr result
-    fun translateOcrResult(ocrResult: Map<Rect, Text.TextBlock>, languageCode: String ): Map<Rect, String> {
+    fun translateOcrResult(ocrResult: Map<Array<Point>, Text.TextBlock>, languageCode: String ): Map<Array<Point>, String> {
 
         // Create a map to store the translated result
-        val translatedResult = mutableMapOf<Rect, String>()
+        val translatedResult = mutableMapOf<Array<Point>, String>()
 
         // Iterate through the ocr result
         for ((rect, textBlock) in ocrResult) {
 
             // Translate the textBlock text to english
             val translatedText = translateTextToEnglish(textBlock.text, languageCode)
-
+//            Log.d("Thenv", "translateOcrResult: ${translatedText}")
             // Add the translated text to the map
             translatedResult[rect] = translatedText
         }

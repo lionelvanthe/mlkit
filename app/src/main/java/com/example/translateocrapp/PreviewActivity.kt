@@ -3,6 +3,7 @@ package com.example.translateocrapp
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Point
 import android.graphics.Rect
 import android.media.ExifInterface
 import androidx.appcompat.app.AppCompatActivity
@@ -49,13 +50,13 @@ class PreviewActivity : AppCompatActivity() {
     private val textTranslator = TextTranslator(this)
 
     // Create a variable to store the OCR result
-    private lateinit var ocrResultMap: Map<Rect, Text.TextBlock>
+    private lateinit var ocrResultMap: Map<Array<Point>, Text.TextBlock>
 
     // Create a variable to store the language detected
     private lateinit var languageCode: String
 
     // Create a variable to store the translated ocr result
-    private lateinit var translatedOcrResultMap: Map<Rect, String>
+    private lateinit var translatedOcrResultMap: Map<Array<Point>, String>
 
     // Job variable to keep track of the OCR job
     private lateinit var ocrJob: Job
@@ -82,7 +83,7 @@ class PreviewActivity : AppCompatActivity() {
         }
 
         val imagePath = intent.getStringExtra(EXTRA_IMAGE_PATH)
-
+        Log.d("Thenv", "onCreate: $imagePath")
         // Initialize the progress bar
         progressBar = ProgressBar(this).apply {
             isIndeterminate = true
@@ -151,7 +152,7 @@ class PreviewActivity : AppCompatActivity() {
     }
 
     // Create a function to process the OCR result
-    private fun processOcrResult(ocrResultMap: Map<Rect, Text.TextBlock>) {
+    private fun processOcrResult(ocrResultMap: Map<Array<Point>, Text.TextBlock>) {
         // Log the OCR result with Rect and text
         for ((rect, textBlock) in ocrResultMap) {
             Log.d("OCR", "Found text ${textBlock.text} at $rect")
@@ -168,7 +169,7 @@ class PreviewActivity : AppCompatActivity() {
     }
 
     // Create a function to process the translation result
-    private fun processTranslationResult(translatedText: Map<Rect, String>) {
+    private fun processTranslationResult(translatedText: Map<Array<Point>, String>) {
         // Handle the translation result
         for ((rect, text) in translatedText) {
             Log.d("Translation", "Translated text $text at $rect")

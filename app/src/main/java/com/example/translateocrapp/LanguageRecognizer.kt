@@ -1,5 +1,6 @@
 package com.example.translateocrapp
 
+import android.graphics.Point
 import android.graphics.Rect
 import android.util.Log
 import com.google.mlkit.nl.languageid.LanguageIdentification
@@ -23,14 +24,14 @@ class LanguageRecognizer {
         languageIdentifierClient = LanguageIdentification.getClient(languageIdentifierOptions)
     }
 
-    fun recognizeLanguage(ocrMap: Map<Rect, Text.TextBlock>): String {
+    fun recognizeLanguage(ocrMap: Map<Array<Point>, Text.TextBlock>): String {
 
         // Iterate through the map of OCR results and recognize the language of each textBlock
         // Find the most common language that is either German or Swedish
         // if neither German nor Swedish is found, return "und"
 
         // Create a map to store the language of each line
-        val languageMap = mutableMapOf<Rect, String>()
+        val languageMap = mutableMapOf<Array<Point>, String>()
 
         // Iterate through the map of OCR results
         for ((rect, textBlock) in ocrMap) {
