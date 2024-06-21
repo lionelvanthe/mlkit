@@ -1,5 +1,6 @@
 package com.example.translateocrapp
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -10,6 +11,10 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.renderscript.Allocation
+import android.renderscript.Element
+import android.renderscript.RenderScript
+import android.renderscript.ScriptIntrinsicBlur
 import android.text.TextPaint
 import android.util.Log
 import com.google.mlkit.vision.text.Text
@@ -21,7 +26,7 @@ object BitmapAnnotator {
 
 
     // Function to take as input a bitmap, a map of OCR results as well as their translations, and return a bitmap annotated with translated ocr results
-    public fun annotateBitmap(bitmap: Bitmap, ocrResult: Map<Array<Point>, Text.TextBlock>, translatedOcrResult: Map<Array<Point>, String>): Bitmap {
+    public fun annotateBitmap(bitmap: Bitmap, ocrResult: Map<Array<Point>, Text.TextBlock>, translatedOcrResult: Map<Array<Point>, String>, context: Context): Bitmap {
 
         // Create a mutable copy of the bitmap
         val annotatedBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -53,6 +58,8 @@ object BitmapAnnotator {
             path.lineTo(points[3].x.toFloat(), points[3].y.toFloat())
             path.close()
             canvas.drawPath(path, rectPaint)
+
+//            blurRegion(bitmap, r, context)
 
             // Store the rectF in the rectFMap
             rectFMap[r] = rectF
@@ -103,7 +110,7 @@ object BitmapAnnotator {
             canvas.setMatrix(matrix)
 
             lines?.forEach {
-                canvas.drawText(it, rectF.left, currentY, textPaint)
+                canvas.drawText(it, points[3].x.toFloat(), currentY, textPaint)
                 currentY += offsetLine
             }
             // Khôi phục trạng thái canvas ban đầu
@@ -112,6 +119,33 @@ object BitmapAnnotator {
         }
 
         return annotatedBitmap
+    }
+
+    private fun blurRegion(bitmap: Bitmap, rect: Rect, context: Context) {
+        val rs = RenderScript.create(context)
+        val input = Allocation.createFromBitmap(rs, bitmap)
+        val output = Allocation.createTyped(rs, input.type)
+        val script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs))
+        script.setRadius(10f) // Set the blur radius (1-25)
+        script.setInput(input)
+
+        // Blur the entire bitmap and then copy the blurred portion to the original
+        script.forEach(output)
+        output.copyTo(bitmap)
+
+        // Create a temporary bitmap for the blurred region
+        val tempBitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888)
+        val tempCanvas = Canvas(tempBitmap)
+        tempCanvas.drawBitmap(bitmap, -rect.left.toFloat(), -rect.top.toFloat(), null)
+
+        // Draw the blurred region back to the original bitmap
+        Canvas(bitmap).drawBitmap(tempBitmap, rect.left.toFloat(), rect.top.toFloat(), null)
+
+        // Clean up
+        input.destroy()
+        output.destroy()
+        script.destroy()
+        rs.destroy()
     }
 
     private fun Rect.clampToBitmap(bitmap: Bitmap): Rect {
@@ -124,10 +158,10 @@ object BitmapAnnotator {
 
     // Function to get the average color of a region in a bitmap
     private fun getAverageColor(bitmap: Bitmap, rect: Rect): Int {
-        var redSum = 0
-        var greenSum = 0
-        var blueSum = 0
-        var pixelCount = 0
+        var redSum = 1
+        var greenSum = 1
+        var blueSum = 1
+        var pixelCount = 1
 
         for (x in rect.left until rect.right) {
             for (y in rect.top until rect.bottom) {
